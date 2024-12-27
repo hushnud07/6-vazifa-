@@ -1,16 +1,14 @@
-import express from "express";
+import express, { Router } from "express";
 import connectDB from "./config/database.js";
-import studentRoutes from "./routes/student.Routes.js";
-import groupRoutes from "./routes/group.Routes.js";
+import Routes from "./routes/routes.js";
 
 const app = express();
 const PORT = 4000;
 
 app.use(express.json());
 
-app.use("/api/students", studentRoutes);
-app.use("/api/groups", groupRoutes);
-
+app.use("/api", ...Routes());
+app.use("/api", ...Routes());
 connectDB().then(() => {
   app.listen(PORT, () => console.log(`"Server running on port ${PORT}`));
 });

@@ -1,13 +1,23 @@
 import express from "express";
-import * as groupController from "../controllers/group.Controller.js";
+import GroupController from "../controllers/group.Controller.js";
 
-const router = express.Router();
+const groupRouter = express.Router();
+const groupControl = new GroupController();
 
-router.get("/", groupController.getAllGroups);
-router.get("/:id", groupController.getGroupById);
-router.post("/", groupController.createGroup);
-router.put("/:id", groupController.updateGroup);
-router.delete("/:id", groupController.deleteGroup);
-router.post("/:id/students", groupController.addStudentToGroup);
-
-export default router;
+groupRouter.post("/group", (req, res) =>
+  groupControl.createGroupController(req, res)
+);
+groupRouter.get("/group", (req, res) => groupControl.getAllGroup(req, res));
+groupRouter.get("/group/:id", (req, res) =>
+  groupControl.findGroupById(req, res)
+);
+groupRouter.put("/group/:id", (req, res) =>
+  groupControl.updateGroupById(req, res)
+);
+groupRouter.delete("/group/:id", (req, res) =>
+  groupControl.deleteByIdGroup(req, res)
+);
+groupRouter.post("/:id/students", (req, res) =>
+  groupControl.addStudentToGroup(req, res)
+);
+export default groupRouter;

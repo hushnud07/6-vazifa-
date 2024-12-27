@@ -1,22 +1,88 @@
-import Student from "../models/student.js";
-export const createStudent = async (data) => {
-  const newStudent = new Student(data);
-  return await newStudent.save();
-};
+import studentRouter from "../routes/student.Routes.js";
+import StudentService from "../services/student.Service.js";
 
-export const getAllStudents = async () => {
-  return await Student.find().populate("group");
-};
+class StudentController {
+  constructor() {
+    this.studentService = new StudentService();
+  }
+  async createStudentController(req, res) {
+    try {
+      const body = req.body;
+      const data = await this.studentService.createStudent(body);
+      res.statusCode = 201;
+      res.send({
+        message: "Student successfully created",
+        student: data,
+      });
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  async updateStudent(req, res) {
+    try {
+      const body = req.body;
+      const data = await this.studentService.updateStudents(body);
+      res.statusCode = 201;
+      res.send({ message: "Student successfuly update" });
+    } catch (error) {
+      res.statusCode = 400;
 
-export const getStudentById = async (id) => {
-  return await Student.findById(id).populate("group");
-};
+      res.send({ message: error.message });
+    }
+  }
+  async getAllStudents(req, res) {
+    try {
+      const body = req.body;
+      const data = await this.studentService.getAllStudents(body);
+      res.statusCode = 201;
+      res.send(data);
+    } catch (error) {
+      res.statusCode = 400;
+      res.send({ message: error.message });
+    }
+  }
+  async getByIdStudents(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await this.studentService.getFindByIdStudents(id);
+      res.statusCode = 201;
+      res.send(data);
+    } catch (error) {
+      res.statusCode = 400;
+      res.send({ message: error.message });
+    }
+  }
+  async deleteByIdStudents(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await this.studentService.deleteByIdStudents(id);
+      res.send({ message: "Foydalanuvchi ochirib tashlandi " });
+      res.statusCode = 201;
+    } catch (error) {
+      res.statusCode = 400;
+      res.send({ message: error.message });
+    }
+  }
+  async joinGroupController(req, res) {
+    try {
+      const { studentId } = req.params;
+      const body = req.body;
+      const data = await this.studentService.joinGroup(studentId, body);
+      if (data) {
+        res.statusCode = 200;
+        res.send({
+          message: "Successfully joined",
+          success: true,
+        });
+      }
+    } catch (error) {
+      res.statusCode = 400;
+      res.send({
+        message: error.message,
+        success: false,
+      });
+    }
+  }
+}
 
-
-export const updateStudent = async (id, data) => {
-  return await Student.findByIdAndUpdate(id, data, { new: true });
-};
-
-export const deleteStudent = async (id) => {
-  return await Student.findByIdAndDelete(id);
-};
+export default StudentController;

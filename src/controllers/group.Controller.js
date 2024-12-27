@@ -1,43 +1,61 @@
-import Group from "../models/group.js";
-import Student from "../models/student.js";
+import GroupService from "../services/group.Service.js";
 
-export const getAllGroups = async () => {
-  return await Group.find().populate("students");
-};
-
-export const getGroupById = async (id) => {
-  return await Group.findById(id).populate("students");
-};
-
-export const createGroup = async (data) => {
-  const newGroup = new Group(data);
-  return await newGroup.save();
-};
-
-export const updateGroup = async (id, data) => {
-  return await Group.findByIdAndUpdate(id, data, { new: true });
-};
-
-export const deleteGroup = async (id) => {
-  return await Group.findByIdAndDelete(id);
-};
-
-export const addStudentToGroup = async (groupId, studentId) => {
-  const group = await Group.findById(groupId);
-  if (!group) throw new Error("Group not found");
-
-  if (group.students.length >= group.maxStudents) {
-    throw new Error("Group is full");
+class GroupController {
+  constructor() {
+    this.groupService = new GroupService();
   }
-
-  const student = await Student.findById(studentId);
-  if (!student) throw new Error("Student not found");
-
-  group.students.push(student._id);
-  await group.save();
-
-  student.group = group._id;
-  await student.save();
-
-  return { message: "Student added to group" };
-};
+  async createGroupController(req, res) {
+    try {
+      const body = req.body;
+      const data = await this.groupService.createGroup(body);
+      res.statusCode = 201;
+      res.send({ message: "Group successfuly created", group: data });
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  async getAllGroup(req, res) {
+    try {
+      const body = req.body;
+      const data = await this.groupService.getAllGroup(body);
+      res.statusCode = 201;
+      res.send(data);
+    } catch (error) {
+      console.error(error.message);
+    }
+  }
+  async findGroupById(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await this.groupService.findGroupbyId(id);
+      res.statusCode = 201;
+      res.send(data);
+    } catch (error) {
+      res.statusCode = 400;
+      console.error({ message: error, message });
+    }
+  }
+  async updateGroupById(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await this.groupService.updateGroupById(id);
+      res.statusCode = 201;
+      res.send({ message: "Gruppa muofaqayatli yagnilandi" });
+    } catch (error) {
+      res.statusCode = 400;
+      console.error({ message: error.message });
+    }
+  }
+  async deleteByIdGroup(req, res) {
+    try {
+      const { id } = req.params;
+      const data = await this.groupService.deleteGroupById(id);
+      res.statusCode = 201;
+      res.send({ message: "Gruppa mofaqayatli ochirildi" });
+    } catch (error) {
+      res.statusCode = 400;
+      res.send({ message: error, message });
+    }
+  }
+}
+export default GroupController;
